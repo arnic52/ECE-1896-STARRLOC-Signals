@@ -8,10 +8,16 @@
 % reset the workspace
 clear, clc
 
+%% listen to audio messages
+% original signal
+% sound(5*samples_raw,sample_rate_raw)
+% most noise cut out
+% sound(5*voice_containing_signal,sample_rate)
+
 %% get example message samples
 
 % get samples from file
-filename = 'TestMessage.wav';                                               % define the filename
+filename = 'DemodulatedVoiceTestMessage.wav';                                               % define the filename
 [samples_raw, sample_rate_raw] = audioread(filename);                       % extract data from wav file
 
 % downsample the message to required samples
