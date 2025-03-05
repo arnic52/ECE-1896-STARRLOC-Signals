@@ -26,6 +26,7 @@ from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import iio
+import ece_1896_nichols_voice_detection_wbfm_epy_block_0 as epy_block_0  # embedded python block
 import sip
 import threading
 
@@ -99,7 +100,7 @@ class ece_1896_nichols_voice_detection_wbfm(gr.top_block, Qt.QWidget):
 
         self.qtgui_time_sink_x_2.set_y_label('Amplitude', "")
 
-        self.qtgui_time_sink_x_2.enable_tags(True)
+        self.qtgui_time_sink_x_2.enable_tags(False)
         self.qtgui_time_sink_x_2.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
         self.qtgui_time_sink_x_2.enable_autoscale(False)
         self.qtgui_time_sink_x_2.enable_grid(False)
@@ -256,6 +257,7 @@ class ece_1896_nichols_voice_detection_wbfm(gr.top_block, Qt.QWidget):
         self.iio_pluto_source_0.set_rfdc(True)
         self.iio_pluto_source_0.set_bbdc(True)
         self.iio_pluto_source_0.set_filter_params('Auto', '', 0, 0)
+        self.epy_block_0 = epy_block_0.save_mp3_on_trigger(sample_rate=48000)
         self.digital_costas_loop_cc_0 = digital.costas_loop_cc((2*3.1415/100), 2, False)
         self.digital_binary_slicer_fb_0 = digital.binary_slicer_fb()
         self.blocks_sub_xx_0 = blocks.sub_ff(1)
@@ -307,8 +309,10 @@ class ece_1896_nichols_voice_detection_wbfm(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_multiply_xx_0, 0), (self.blocks_integrate_xx_0_0, 0))
         self.connect((self.blocks_multiply_xx_1, 0), (self.blocks_integrate_xx_0, 0))
         self.connect((self.blocks_multiply_xx_2, 0), (self.audio_sink_0, 0))
+        self.connect((self.blocks_multiply_xx_2, 0), (self.epy_block_0, 0))
         self.connect((self.blocks_multiply_xx_2, 0), (self.qtgui_time_sink_x_2, 0))
         self.connect((self.blocks_repeat_0, 0), (self.blocks_multiply_xx_2, 1))
+        self.connect((self.blocks_repeat_0, 0), (self.epy_block_0, 1))
         self.connect((self.blocks_repeat_0, 0), (self.qtgui_time_sink_x_1, 0))
         self.connect((self.blocks_sub_xx_0, 0), (self.digital_binary_slicer_fb_0, 0))
         self.connect((self.digital_binary_slicer_fb_0, 0), (self.blocks_char_to_float_0, 0))

@@ -188,7 +188,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [896, 944.0]
+    coordinate: [912, 944.0]
     rotation: 0
     state: enabled
 - name: blocks_char_to_float_0
@@ -205,7 +205,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [384, 1056.0]
+    coordinate: [384, 1096.0]
     rotation: 0
     state: enabled
 - name: blocks_complex_to_mag_0
@@ -413,7 +413,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [544, 1056.0]
+    coordinate: [544, 1096.0]
     rotation: 0
     state: enabled
 - name: blocks_sub_xx_0
@@ -446,7 +446,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [216, 1064.0]
+    coordinate: [216, 1104.0]
     rotation: 0
     state: enabled
 - name: digital_costas_loop_cc_0
@@ -465,6 +465,55 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [424, 200.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_0
+  id: epy_block
+  parameters:
+    _source_code: "import numpy as np\nimport wave\nimport os\nimport time\nfrom gnuradio\
+      \ import gr\nfrom pydub import AudioSegment\nfrom pydub.generators import Sine\n\
+      \nclass save_mp3_on_trigger(gr.sync_block):\n    \"\"\"\n    Embedded Python\
+      \ Block that records float samples into an MP3 file when a trigger signal is\
+      \ detected.\n    Input 1 is the float audio stream. Input 2 is the float trigger\
+      \ signal.\n    \"\"\"\n    def __init__(self, sample_rate=48000):\n        gr.sync_block.__init__(\n\
+      \            self,\n            name=\"save_mp3_on_trigger\",\n            in_sig=[np.float32,\
+      \ np.float32],  # Float samples and trigger signal\n            out_sig=None\n\
+      \        )\n        self.sample_rate = sample_rate\n        self.recording =\
+      \ False\n        self.audio_buffer = []\n        self.output_dir = \"recordings\"\
+      \n        if not os.path.exists(self.output_dir):\n            os.makedirs(self.output_dir)\n\
+      \n    def start_new_recording(self):\n        timestamp = time.strftime(\"%Y-%m-%d_%H-%M-%S\"\
+      )\n        self.filename = os.path.join(self.output_dir, f\"recording_{timestamp}.wav\"\
+      )\n        self.audio_buffer = []\n        print(f\"Recording started: {self.filename}\"\
+      )\n\n    def stop_and_save(self):\n        if self.audio_buffer:\n         \
+      \   temp_wav = self.filename\n            with wave.open(temp_wav, 'w') as wf:\n\
+      \                wf.setnchannels(1)\n                wf.setsampwidth(2)\n  \
+      \              wf.setframerate(self.sample_rate)\n                wf.writeframes(np.array(self.audio_buffer,\
+      \ dtype=np.int16).tobytes())\n            \n            audio = AudioSegment.from_wav(temp_wav)\n\
+      \            mp3_filename = temp_wav.replace(\".wav\", \".mp3\")\n         \
+      \   audio.export(mp3_filename, format=\"mp3\")\n            os.remove(temp_wav)\
+      \  # Delete temporary WAV file\n            print(f\"Saved recording: {mp3_filename}\"\
+      )\n        self.audio_buffer = []\n\n    def work(self, input_items, output_items):\n\
+      \        samples = input_items[0]\n        trigger = input_items[1]\n      \
+      \  \n        for i in range(len(samples)):\n            if trigger[i] == 1:\n\
+      \                if not self.recording:\n                    self.recording\
+      \ = True\n                    self.start_new_recording()\n                self.audio_buffer.append(int(samples[i]\
+      \ * 32767))\n            elif self.recording:\n                self.stop_and_save()\n\
+      \                self.recording = False\n\n        return len(samples)\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    sample_rate: '48000'
+  states:
+    _io_cache: ('save_mp3_on_trigger', 'save_mp3_on_trigger', [('sample_rate', '48000')],
+      [('0', 'float', 1), ('1', 'float', 1)], [], '\n    Embedded Python Block that
+      records float samples into an MP3 file when a trigger signal is detected.\n    Input
+      1 is the float audio stream. Input 2 is the float trigger signal.\n    ', ['sample_rate'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [912, 1072.0]
     rotation: 0
     state: enabled
 - name: iio_pluto_source_0
@@ -712,7 +761,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [752, 1040.0]
+    coordinate: [752, 1192.0]
     rotation: 0
     state: enabled
 - name: qtgui_time_sink_x_2
@@ -744,7 +793,7 @@ blocks:
     color9: dark green
     comment: ''
     ctrlpanel: 'False'
-    entags: 'True'
+    entags: 'False'
     grid: 'False'
     gui_hint: ''
     label1: Signal 1
@@ -809,7 +858,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [896, 840.0]
+    coordinate: [912, 840.0]
     rotation: 0
     state: enabled
 - name: virtual_sink_0
@@ -861,7 +910,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [8, 1056.0]
+    coordinate: [8, 1096.0]
     rotation: 0
     state: enabled
 - name: virtual_source_0_1
@@ -898,8 +947,10 @@ connections:
 - [blocks_multiply_xx_0, '0', blocks_integrate_xx_0_0, '0']
 - [blocks_multiply_xx_1, '0', blocks_integrate_xx_0, '0']
 - [blocks_multiply_xx_2, '0', audio_sink_0, '0']
+- [blocks_multiply_xx_2, '0', epy_block_0, '0']
 - [blocks_multiply_xx_2, '0', qtgui_time_sink_x_2, '0']
 - [blocks_repeat_0, '0', blocks_multiply_xx_2, '1']
+- [blocks_repeat_0, '0', epy_block_0, '1']
 - [blocks_repeat_0, '0', qtgui_time_sink_x_1, '0']
 - [blocks_sub_xx_0, '0', virtual_sink_0, '0']
 - [digital_binary_slicer_fb_0, '0', blocks_char_to_float_0, '0']
