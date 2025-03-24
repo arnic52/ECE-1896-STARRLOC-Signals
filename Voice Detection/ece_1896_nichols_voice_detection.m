@@ -39,6 +39,27 @@ noise_samples = 10^(noise_adj/20)*noise_samples;
 % add the noise to the voice signal
 noisy_voice_samples = voice_samples + noise_samples;
 
+% efficiently calculate the autocorrelation using the wiener khintchine thm
+% and the power spectral density obtained using the fft
+% compute the spectra of the signals for comparison
+[f, voice_spec] = GetSpectrum(t,voice_samples,sample_rate);
+voice_mag_spec = abs(voice_spec);
+voice_mag_spec_dB = 20*log10(voice_mag_spec);
+[~, noise_spec] = GetSpectrum(t,noise_samples,sample_rate);
+noise_mag_spec = abs(noise_spec);
+noise_mag_spec_dB = 20*log10(noise_mag_spec);
+[~, noisy_voice_spec] = GetSpectrum(t,noisy_voice_samples,sample_rate);
+noisy_voice_mag_spec = abs(noisy_voice_spec);
+noisy_voice_mag_spec_dB = 20*log10(noisy_voice_mag_spec);
+
+% % get the power spectral density (energy spectral density)
+% voice_psd = voice_mag_spec.^2;
+% noise_psd = noise_mag_spec.^2;
+% noisy_voice_psd = noisy_voice_mag_spec.^2;
+% 
+% % get the autocorrelation function for each signal
+% voice_autocorr = fftshift(fft(voice_psd));
+
 % compute the 0th autocorrelation coefficient (not normalized)
 k = 0;
 voice_autocorr_0 = sum(voice_samples(1:N-k) .* voice_samples(k+1:N));
@@ -50,13 +71,7 @@ voice_autocorr_1 = sum(voice_samples(1:N-k) .* voice_samples(k+1:N));
 noise_autocorr_1 = sum(noise_samples(1:N-k) .* noise_samples(k+1:N));
 voice_noisy_autocorr_1 = sum(noisy_voice_samples(1:N-k) .* noisy_voice_samples(k+1:N));
 
-% compute the spectra of the signals for comparison
-[f, voice_spec] = GetSpectrum(t,voice_samples,sample_rate);
-voice_mag_spec = 20*log10(abs(voice_spec));
-[~, noise_spec] = GetSpectrum(t,noise_samples,sample_rate);
-noise_mag_spec = 20*log10(abs(noise_spec));
-[~, noisy_voice_spec] = GetSpectrum(t,noisy_voice_samples,sample_rate);
-noisy_voice_mag_spec = 20*log10(abs(noisy_voice_spec));
+
 
 % initialize figure number
 fig_num = 1;
@@ -72,7 +87,7 @@ title("Voice Signal")
 xlabel("time [sec]")
 ylabel("Amplitude")
 nexttile
-plot(f, voice_mag_spec, 'b-')
+plot(f, voice_mag_spec_dB, 'b-')
 title("Voice Magnitude Spectrum")
 xlabel("frequency [Hz]")
 ylabel("Amplitude [dB]")
@@ -97,7 +112,7 @@ title("Noise Signal")
 xlabel("time [sec]")
 ylabel("Amplitude")
 nexttile
-plot(f, noise_mag_spec, 'r-')
+plot(f, noise_mag_spec_dB, 'r-')
 title("Noise Magnitude Spectrum")
 xlabel("frequency [Hz]")
 ylabel("Amplitude [dB]")
@@ -122,7 +137,7 @@ title("Noisy Voice Signal")
 xlabel("time [sec]")
 ylabel("Amplitude")
 nexttile
-plot(f, noisy_voice_mag_spec, 'm-')
+plot(f, noisy_voice_mag_spec_dB, 'm-')
 title("Noisy Voice Magnitude Spectrum")
 xlabel("frequency [Hz]")
 ylabel("Amplitude [dB]")

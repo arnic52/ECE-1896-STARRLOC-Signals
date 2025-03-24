@@ -85,6 +85,7 @@ plot(voice_lags, voice_autocorr, 'b-')
 title("Voice Autocorrelation")
 xlabel("n")
 ylabel("Amplitude")
+xlim([-20,20])
 
 % plot the noise time domain message and its autocorrelation
 figure(fig_num)
@@ -110,6 +111,7 @@ plot(noise_lags, noise_autocorr, 'r-')
 title("Noise Autocorrelation")
 xlabel("n")
 ylabel("Amplitude")
+xlim([-20,20])
 
 % plot the noisy voice time domain message and its autocorrelation
 figure(fig_num)
